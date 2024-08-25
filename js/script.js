@@ -30,6 +30,9 @@ let word = "magnolia";
 // Global variable to store the player's guessed letters
 let guessedLetters = [];
 
+// Global variable to store the remaining number of guesses
+let remainingGuesses = 8;
+
 // Function to add placeholders for each letter in the word
 const addPlaceholders = function (word) {
     const placeholders = [];
@@ -88,6 +91,27 @@ const updateWordInProgress = function (guessedLetters) {
     checkIfPlayerWon();
 };
 
+// Function to count the remaining guesses
+const countGuessesRemaining = function (guess) {
+    const wordUpper = word.toUpperCase();
+
+    if (!wordUpper.includes(guess)) {
+        message.innerText = `Sorry, the word does not contain the letter "${guess}".`;
+        remainingGuesses -= 1;
+    } else {
+        message.innerText = `Good guess! The word contains the letter "${guess}".`;
+    }
+
+    if (remainingGuesses === 0) {
+        message.innerHTML = `<p class="highlight">Game over! The word was ${wordUpper}.</p>`;
+        startOver();  // You would need to define a function to handle the restart logic
+    } else if (remainingGuesses === 1) {
+        remainingGuessesSpan.innerText = `1 guess`;
+    } else {
+        remainingGuessesSpan.innerText = `${remainingGuesses} guesses`;
+    }
+};
+
 // Function to check if the player has won
 const checkIfPlayerWon = function () {
     if (wordInProgress.innerText === word.toUpperCase()) {
@@ -105,6 +129,11 @@ const makeGuess = function (letter) {
     } else {
         guessedLetters.push(letter);
         showGuessedLetters();
+
+        // Update the remaining guesses based on whether the guess is correct
+        countGuessesRemaining(letter);
+
+        // Call the function to update the word in progress
         updateWordInProgress(guessedLetters);
     }
 };
@@ -124,3 +153,6 @@ guessButton.addEventListener("click", function(e) {
 
     letterInput.value = "";
 });
+
+// Call the async function to get a random word when the game starts
+getWord();

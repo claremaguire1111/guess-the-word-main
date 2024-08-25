@@ -27,6 +27,9 @@ const playAgainButton = document.querySelector(".play-again");
 // The starting word to test out the game
 let word = "magnolia";
 
+// Global variable to store the player's guessed letters
+let guessedLetters = [];
+
 // Function to add placeholders for each letter in the word
 const addPlaceholders = function (word) {
     // Create an array with one circle symbol (●) for each letter in the word
@@ -42,17 +45,65 @@ const addPlaceholders = function (word) {
 // Call the function and pass the word variable as the argument
 addPlaceholders(word);
 
-// Add an event listener for when a player clicks the Guess button
+// Function to validate the player's input
+const validateInput = function (input) {
+    // Regular expression for accepted letters (a-z, A-Z)
+    const acceptedLetter = /[a-zA-Z]/;
+
+    // Check if the input is empty
+    if (input === "") {
+        message.innerText = "Please enter a letter.";
+    }
+    // Check if the player has entered more than one letter
+    else if (input.length > 1) {
+        message.innerText = "Please enter a single letter.";
+    }
+    // Check if the input matches the accepted letter sequence
+    else if (!input.match(acceptedLetter)) {
+        message.innerText = "Please enter a letter from A to Z.";
+    }
+    // If the input is valid (a single letter), return the input
+    else {
+        return input;
+    }
+};
+
+// Function to handle the player's guess
+const makeGuess = function (letter) {
+    // Convert the letter to uppercase
+    letter = letter.toUpperCase();
+
+    // Check if the guessedLetters array already contains the letter
+    if (guessedLetters.includes(letter)) {
+        message.innerText = "You've already guessed that letter. Try again.";
+    } else {
+        // If the letter hasn't been guessed yet, add it to the guessedLetters array
+        guessedLetters.push(letter);
+        console.log(guessedLetters);
+    }
+};
+
+// Event listener for when a player clicks the Guess button
 guessButton.addEventListener("click", function(e) {
-    // Prevent the default behavior of the form submitting and reloading the page
     e.preventDefault();
+
+    // Clear the previous message
+    message.innerText = "";
 
     // Capture the value of the input
     const guessedLetter = letterInput.value;
 
-    // Log out the value of the variable capturing the input
-    console.log(guessedLetter);
+    // Validate the input and store the result in a variable
+    const validInput = validateInput(guessedLetter);
+
+    // If validInput is a letter (not undefined), pass it to the makeGuess function
+    if (validInput) {
+        makeGuess(validInput);
+    }
 
     // Empty the value of the input field
     letterInput.value = "";
 });
+
+
+

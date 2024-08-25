@@ -32,13 +32,10 @@ let guessedLetters = [];
 
 // Function to add placeholders for each letter in the word
 const addPlaceholders = function (word) {
-    // Create an array with one circle symbol (●) for each letter in the word
     const placeholders = [];
     for (let i = 0; i < word.length; i++) {
         placeholders.push("●");
     }
-
-    // Update the word-in-progress paragraph's innerText with the placeholders
     wordInProgress.innerText = placeholders.join("");
 };
 
@@ -47,39 +44,68 @@ addPlaceholders(word);
 
 // Function to validate the player's input
 const validateInput = function (input) {
-    // Regular expression for accepted letters (a-z, A-Z)
     const acceptedLetter = /[a-zA-Z]/;
 
-    // Check if the input is empty
     if (input === "") {
         message.innerText = "Please enter a letter.";
-    }
-    // Check if the player has entered more than one letter
-    else if (input.length > 1) {
+    } else if (input.length > 1) {
         message.innerText = "Please enter a single letter.";
-    }
-    // Check if the input matches the accepted letter sequence
-    else if (!input.match(acceptedLetter)) {
+    } else if (!input.match(acceptedLetter)) {
         message.innerText = "Please enter a letter from A to Z.";
-    }
-    // If the input is valid (a single letter), return the input
-    else {
+    } else {
         return input;
+    }
+};
+
+// Function to update the page with the letters the player guesses
+const showGuessedLetters = function () {
+    guessedLettersList.innerHTML = "";
+
+    guessedLetters.forEach(function (letter) {
+        const li = document.createElement("li");
+        li.innerText = letter;
+        guessedLettersList.appendChild(li);
+    });
+};
+
+// Function to update the word in progress
+const updateWordInProgress = function (guessedLetters) {
+    const wordUpper = word.toUpperCase();
+    const wordArray = wordUpper.split("");
+
+    const revealWord = [];
+
+    wordArray.forEach(function (letter) {
+        if (guessedLetters.includes(letter)) {
+            revealWord.push(letter);
+        } else {
+            revealWord.push("●");
+        }
+    });
+
+    wordInProgress.innerText = revealWord.join("");
+
+    checkIfPlayerWon();
+};
+
+// Function to check if the player has won
+const checkIfPlayerWon = function () {
+    if (wordInProgress.innerText === word.toUpperCase()) {
+        message.classList.add("win");
+        message.innerHTML = `<p class="highlight">You guessed the word! Congrats!</p>`;
     }
 };
 
 // Function to handle the player's guess
 const makeGuess = function (letter) {
-    // Convert the letter to uppercase
     letter = letter.toUpperCase();
 
-    // Check if the guessedLetters array already contains the letter
     if (guessedLetters.includes(letter)) {
         message.innerText = "You've already guessed that letter. Try again.";
     } else {
-        // If the letter hasn't been guessed yet, add it to the guessedLetters array
         guessedLetters.push(letter);
-        console.log(guessedLetters);
+        showGuessedLetters();
+        updateWordInProgress(guessedLetters);
     }
 };
 
@@ -87,23 +113,14 @@ const makeGuess = function (letter) {
 guessButton.addEventListener("click", function(e) {
     e.preventDefault();
 
-    // Clear the previous message
     message.innerText = "";
 
-    // Capture the value of the input
     const guessedLetter = letterInput.value;
-
-    // Validate the input and store the result in a variable
     const validInput = validateInput(guessedLetter);
 
-    // If validInput is a letter (not undefined), pass it to the makeGuess function
     if (validInput) {
         makeGuess(validInput);
     }
 
-    // Empty the value of the input field
     letterInput.value = "";
 });
-
-
-
